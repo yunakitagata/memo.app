@@ -32,6 +32,10 @@ const date = ref('')
 const title = ref('')
 const amount = ref('')
 const category = ref('')
+const scheduleDate = ref('')
+const scheduleTitle = ref('')
+const scheduleAmount = ref('')
+
 
 const changeType = (newType: string) => {
     /*changeTypeという名前の関数を作る。newTypeという引数を受け取る。その方はstringである。*/
@@ -97,6 +101,59 @@ onMounted(()=>{
     getTransactions()
 })
 
+const schedule = async () => {
+    /*saveformという変数を作る。*/
+
+    console.log('保存ボタン２が押されました')
+
+    console.log(
+        scheduleDate.value,
+        scheduleTitle.value,
+        scheduleAmount.value,
+    )
+
+    const response = await fetch ('/api/transactions/schedule',{
+        /*fetchにより/api/transactions に通信を送る。/api/memosは通信先のurl。api.phpに/memosという受付先で*/
+        method: 'POST',
+        /*POST通信として送ります*/
+        headers: {
+            /*headersは送るデータについての追加情報*/
+            'Content-Type':'application/json'
+        },
+        body: JSON.stringify({
+            /*JavaScriptのオブジェクトをJSON文字列へ変換する*/
+            date: scheduleDate.value,
+            title: scheduleTitle.value,
+            amount: scheduleAmount.value,
+
+            /*👆(Laravelに送るためのデータ名):(vueで現在textareaに入っている値)*/
+        }),
+
+    })
+    if (response.ok) {
+        console.log('保存2成功')
+        await getTransactionsschedule()
+    }
+    //POSTは成功した？という確認。成功していたらsavedイベントを親に送る
+}
+
+
+const getTransactionsschedule = async () =>{
+    //これらはメモを取得する処理
+    const response = await fetch('/api/transactions/schedule',{
+        //fetchによりapi/memos通信を送っている。そして返ってきたものをresponseに送っている
+        method: 'GET',
+        //データを送信するためのGET通信です
+    })
+    scheduledpayments.value = await response.json()
+    //ここでvalueが付くのはmemos自体を入れ替えるのではなくvueが監視している箱はそのままにして、中身のvalueを変えるから
+}
+
+onMounted(()=>{
+    //index.vueが画面に表示されたらgetMemos()を実行してという意味になる。ポイントは画面に表示されたら自動実行されたい処理であるということ
+    getTransactionsschedule()
+})
+
 const deleteTransaction = async (id: number) => {
     const response = await fetch(`/api/transactions/${id}`,{
         //fetchによりapi/memos通信を送っている。そして返ってきたものをresponseに送っている
@@ -156,6 +213,7 @@ const scheduledPaymentTotal = computed(()=>{
 
 <template>
     <div class="p-8 bg-primary-50 min-h-screen">
+        <p>テスト表示</p>
         <form>
 
             <button type="button"
@@ -223,6 +281,42 @@ const scheduledPaymentTotal = computed(()=>{
             <p>記録を保存</p>
         </button>
 
+        <form>
+
+
+            <p>予定支払い</p>
+
+            <input
+                v-model="scheduleTitle"
+                type="text"
+                placeholder="例：クレジットカード支払い">
+
+            <input
+                v-model="scheduleDate"
+                type="date"
+                placeholder="例：8月23日">
+
+            <input
+                v-model="scheduleAmount"
+                type="number"
+                placeholder="例：8000">
+
+
+        </form>
+
+        <button
+            class="schedule-save"
+            @click="schedule">
+            <!--ボタンがクリックされるとsaveMemo()が実行される-->
+
+            <PlusSvg class="save-plus"/>
+            <p>記録を保存</p>
+        </button>
+
+        <p>収入合計:{{ incomeTotal }}円</p>
+        <p>現在までの支出:{{ expenseTotal }}円</p>
+        <p>今後の支払い{{ scheduledPaymentTotal }}円</p>
+        <p>あと使えるお金</p>
 
         <div class="transaction-item"
              v-for="transaction in transactions"
@@ -245,11 +339,7 @@ const scheduledPaymentTotal = computed(()=>{
 
         </div>
 
-        <p>収入合計:{{ incomeTotal }}円</p>
-        <p>現在までの支出:{{ expenseTotal }}円</p>
-        <p>今後の支払い{{}}円</p>
-        <p>今後の支払い合計</p>
-        <p>あと使えるお金</p>
+
     </div>
 </template>
 
