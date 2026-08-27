@@ -166,6 +166,19 @@ const deleteTransaction = async (id: number) => {
 
 }
 
+const deleteScheduledPayment = async (id: number) => {
+    const response = await fetch(`/api/transactions/schedule/${id}`,{
+        //fetchによりapi/memos通信を送っている。そして返ってきたものをresponseに送っている
+        method: 'DELETE',
+        //データを送信するためのGET通信です
+    })
+    if (response.ok){
+        await getTransactionsschedule()
+    }
+
+}
+
+
 const expenseTotal = computed(()=>{
     return transactions.value
         //保存済みのtransactionsを使う//
@@ -321,8 +334,8 @@ const scheduledAvailableFundsTotal = computed(()=>{
 
         <p>収入合計:{{ incomeTotal }}円</p>
         <p>現在までの支出:{{ expenseTotal }}円</p>
-        <p>今後の支払い{{ scheduledPaymentTotal }}円</p>
-        <p>あと使えるお金{{ scheduledAvailableFundsTotal }}</p>
+        <p>今後の支払い:{{ scheduledPaymentTotal }}円</p>
+        <p>あと使えるお金:{{ scheduledAvailableFundsTotal }}</p>
 
         <div class="transaction-item"
              v-for="transaction in transactions"
@@ -354,7 +367,14 @@ const scheduledAvailableFundsTotal = computed(()=>{
             <p class="scheduledpayments-title">{{ scheduledpayment.title }}</p>
             <p class="scheduledpayments-amount">{{ scheduledpayment.amount }}</p>
 
+            <button
+                class="deleteschedule-button"
+                @click="deleteScheduledPayment(scheduledpayment.id)">
+                <!--指定されたidのものにおいてdeleteTransactionが適用される-->
 
+                <TrashSvg class="delete-trash"/>
+                削除
+            </button>
 
         </div>
 

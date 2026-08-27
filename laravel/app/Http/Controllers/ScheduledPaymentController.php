@@ -30,4 +30,16 @@ class ScheduledPaymentController extends Controller
     }
 
 
+    public function delete ($id){
+
+        $scheduledpayment = ScheduledPayment::findOrFail($id);
+        //Transactionsテーブルの中からidを探す。見つかったらそれが$transactionに入る//
+        $scheduledpayment->delete();
+        //その一件を削除する//
+        return response()->json([
+            'message' => '削除しました'
+
+        ]);
+    }
+
 }
