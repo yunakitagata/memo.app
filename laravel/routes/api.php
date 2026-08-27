@@ -14,3 +14,4 @@ use App\Http\Controllers\ScheduledPaymentController;
     Route::delete('/transactions/{id}',[TransactionController::class,'delete']);
     Route::post('/transactions/schedule',[ScheduledPaymentController::class,'store']);
     Route::get('/transactions/schedule',[ScheduledPaymentController::class,'index']);
+    Route::delete('/transactions/schedule/{id}',[ScheduledPaymentController::class,'delete']);
