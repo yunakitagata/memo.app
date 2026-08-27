@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import {onMounted, ref, computed} from 'vue'
-import PlusSvg  from '../../components/svgs/PlusSvg.vue'
-import  TrashSvg from '../../components/svgs/TrashSvg.vue'
+import TransactionForm from '../../components/TransactionForm.vue'
+import ScheduledPaymentForm from '../../components/ScheduledPaymentForm.vue'
+import TransactionSummary from '../../components/TransactionSummary.vue'
+import TransactionList from '../../components/TransactionList.vue'
+import ScheduledPaymentList from '../../components/ScheduledPaymentList.vue'
 
 /*保存済みのデータの一覧*/
 const transactions = ref<Transaction[]>([])
@@ -180,14 +183,14 @@ const deleteScheduledPayment = async (id: number) => {
 
 
 const expenseTotal = computed(()=>{
-    return transactions.value
-        //保存済みのtransactionsを使う//
-        .filter(transaction => transaction.type === 'expense')
-        .reduce((sum, transaction) =>{
-            //一件ずつtransactionから取り出して合計する//
-            return sum + transaction.amount
-            //今までの合計に今回のamountを足す//
-        }, 0)
+        return transactions.value
+            //保存済みのtransactionsを使う//
+            .filter(transaction => transaction.type === 'expense')
+            .reduce((sum, transaction) =>{
+                //一件ずつtransactionから取り出して合計する//
+                return sum + transaction.amount
+                //今までの合計に今回のamountを足す//
+            }, 0)
         //合計の初期値は０//
     }
 )
@@ -233,177 +236,39 @@ const scheduledAvailableFundsTotal = computed(()=>{
 <template>
     <div class="p-8 bg-primary-50 min-h-screen">
         <p>テスト表示</p>
-        <form>
 
-            <button type="button"
-                    @click=" changeType('expense')"
-                    :class="{ active: type === 'expense'}"
-            >
-                支出
-                <!--クリックしされた右側の処理を実行する。このボタンを押されたらタイプをexpenseタイプにする-->
-            </button>
-            <button type="button"
-                    @click=" changeType('income')"
-                    :class="{ active: type === 'income'}"
-            >
-                収入
-            </button>
+        <TransactionForm
+            v-model:type="type"
+            v-model:date="date"
+            v-model:title="title"
+            v-model:amount="amount"
+            v-model:category="category"
+            @change-type="changeType"
+            @save="saveform"
+        />
 
-            <p>現在のタイプ：{{ type }}</p>
+        <ScheduledPaymentForm
+            v-model:schedule-date="scheduleDate"
+            v-model:schedule-title="scheduleTitle"
+            v-model:schedule-amount="scheduleAmount"
+            @save="schedule"
+        />
 
-            <input
-            v-model="title"
-            type="text"
-            placeholder="例：学食">
+        <TransactionSummary
+            :income-total="incomeTotal"
+            :expense-total="expenseTotal"
+            :scheduled-payment-total="scheduledPaymentTotal"
+            :scheduled-available-funds-total="scheduledAvailableFundsTotal"
+        />
 
-            <input
-            v-model="date"
-            type="date"
-            placeholder="例：8月23日">
+        <TransactionList
+            :transactions="transactions"
+            @delete="deleteTransaction"
+        />
 
-            <input
-            v-model="amount"
-            type="number"
-            placeholder="例：650">
-
-            <select v-model="category">
-            <option value="">選択してください</option>
-
-                <template v-if="type === 'expense'">
-                    <option value="食費">食費</option>
-                    <option value="交通費">交通費</option>
-                    <option value="娯楽">娯楽</option>
-                    <option value="交際費">交際費</option>
-                    <option value="大学・学習">大学・学習</option>
-                    <option value="買い物">買い物</option>
-                    <option value="美容">美容</option>
-                    <option value="その他">その他</option>
-                </template>
-
-                <template v-if="type === 'income'">
-                    <option value="アルバイト代">アルバイト代</option>
-                    <option value="仕送り">仕送り</option>
-                    <option value="臨時収入">臨時収入</option>
-                    <option value="その他">その他</option>
-                </template>
-
-            </select>
-
-        </form>
-
-        <button
-            class="form-save"
-            @click="saveform">
-            <!--ボタンがクリックされるとsaveMemo()が実行される-->
-
-            <PlusSvg class="save-plus"/>
-            <span>記録を保存</span>
-        </button>
-
-        <form>
-
-
-            <p>予定支払い</p>
-
-            <input
-                v-model="scheduleTitle"
-                type="text"
-                placeholder="例：クレジットカード支払い">
-
-            <input
-                v-model="scheduleDate"
-                type="date"
-                placeholder="例：8月23日">
-
-            <input
-                v-model="scheduleAmount"
-                type="number"
-                placeholder="例：8000">
-
-
-        </form>
-
-        <button
-            class="schedule-save"
-            @click="schedule">
-            <!--ボタンがクリックされるとsaveMemo()が実行される-->
-
-            <PlusSvg class="save-plus"/>
-            <span>記録を保存</span>
-        </button>
-
-        <p>収入合計:{{ incomeTotal }}円</p>
-        <p>現在までの支出:{{ expenseTotal }}円</p>
-        <p>今後の支払い:{{ scheduledPaymentTotal }}円</p>
-        <p>あと使えるお金:{{ scheduledAvailableFundsTotal }}</p>
-
-        <div class="transaction-item"
-             v-for="transaction in transactions"
-             :key="transaction.id"
-        >
-            <p class="transaction-type">{{ transaction.type }}</p>
-            <p class="transaction-date">{{ transaction.date }}</p>
-            <p class="transaction-title">{{ transaction.title }}</p>
-            <p class="transaction-amount">{{ transaction.amount }}</p>
-            <p class="transaction-category">{{ transaction.category }}</p>
-
-            <button
-                class="delete-button"
-                @click="deleteTransaction(transaction.id)">
-                <!--指定されたidのものにおいてdeleteTransactionが適用される-->
-
-                <TrashSvg class="delete-trash"/>
-                削除
-            </button>
-
-        </div>
-
-        <div class="scheduledpayment-item"
-             v-for="scheduledpayment in scheduledpayments"
-             :key="scheduledpayment.id"
-        >
-            <p>今後の支払い</p>
-            <p class="scheduledpayments-date">{{ scheduledpayment.date }}</p>
-            <p class="scheduledpayments-title">{{ scheduledpayment.title }}</p>
-            <p class="scheduledpayments-amount">{{ scheduledpayment.amount }}</p>
-
-            <button
-                class="deleteschedule-button"
-                @click="deleteScheduledPayment(scheduledpayment.id)">
-                <!--指定されたidのものにおいてdeleteTransactionが適用される-->
-
-                <TrashSvg class="delete-trash"/>
-                削除
-            </button>
-
-        </div>
-
-
+        <ScheduledPaymentList
+            :scheduledpayments="scheduledpayments"
+            @delete="deleteScheduledPayment"
+        />
     </div>
 </template>
-
-<style scoped>
-.transaction-item {
-    width: 600px;
-    height: 200px;
-    margin: 15px auto 0;
-    padding: 24px;
-    background-color: white;
-    border-radius: 12px;
-    position: relative;
-}
-.delete-button{
-
-}
-
-.scheduledpayment-item {
-    width: 600px;
-    height: 200px;
-    margin: 15px auto 0;
-    padding: 24px;
-    background-color: pink;
-    border-radius: 12px;
-    position: relative;
-}
-
-</style>
