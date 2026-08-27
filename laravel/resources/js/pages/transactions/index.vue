@@ -278,7 +278,7 @@ const scheduledPaymentTotal = computed(()=>{
             <!--ボタンがクリックされるとsaveMemo()が実行される-->
 
             <PlusSvg class="save-plus"/>
-            <p>記録を保存</p>
+            <span>記録を保存</span>
         </button>
 
         <form>
@@ -310,7 +310,7 @@ const scheduledPaymentTotal = computed(()=>{
             <!--ボタンがクリックされるとsaveMemo()が実行される-->
 
             <PlusSvg class="save-plus"/>
-            <p>記録を保存</p>
+            <span>記録を保存</span>
         </button>
 
         <p>収入合計:{{ incomeTotal }}円</p>
@@ -336,6 +336,19 @@ const scheduledPaymentTotal = computed(()=>{
                 <TrashSvg class="delete-trash"/>
                 削除
             </button>
+
+        </div>
+
+        <div class="scheduledpayment-item"
+             v-for="scheduledpayment in scheduledpayments"
+             :key="scheduledpayment.id"
+        >
+
+            <p class="scheduledpayments-date">{{ scheduledpayment.date }}</p>
+            <p class="scheduledpayments-title">{{ scheduledpayment.title }}</p>
+            <p class="scheduledpayments-amount">{{ scheduledpayment.amount }}</p>
+
+
 
         </div>
 
