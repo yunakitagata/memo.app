@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import TextareaFrom from "@/components/TextareaFrom.vue";
 import PlusSvg  from '@/components/svgs/PlusSvg.vue';
 import DocumentSvg from "@/components/svgs/DocumentSvg.vue";
@@ -31,6 +32,17 @@ onMounted(()=>{
 })
 
 memos.value.length
+
+const router = useRouter()
+const goToTransaction = () =>{
+    isPeeling.value = true
+}
+
+const isPeeling = ref(false)
+
+const finishPeering = () => {
+    router.push('/transactions')
+}
 
 </script>
 
@@ -65,6 +77,14 @@ memos.value.length
 
             </div>
         </div>
+
+        <button
+            @click="goToTransaction"
+            class=" page-controller"
+            :class="{  peeling: isPeeling }"
+            @transitionend="finishPeering">
+
+        </button>
 
     </main>
 
@@ -114,4 +134,39 @@ memos.value.length
     top: 10px;
     color: #b0b0b0;
 }
+.page-controller{
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 70px;
+    height: 70px;
+
+
+
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 100%
+    );
+
+    cursor: pointer;
+    transform-origin: top right;
+    transition: transform 0.7s;
+
+    background: linear-gradient(
+        225deg,
+        #fff7ed 0%,
+        #fed7aa 60%,
+        #fdba74 100%
+    );
+
+    filter: drop-shadow(-6px 6px 8px rgba(0, 0, 0, 0.25));
+    z-index: 1000;
+}
+
+
+.page-controller.peeling:hover{
+    transform: scale(28) rotate(1deg);
+}
+
 </style>
