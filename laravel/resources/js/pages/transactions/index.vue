@@ -196,7 +196,7 @@ const incomeTotal = computed(()=>{
 
 const scheduledPaymentTotal = computed(()=>{
         return scheduledpayments.value
-            //このreturnではcomputedの計算結果として何を消すのかというreturn//
+            //このreturnではcomputedの計算結果として何を返すのかというreturn//
             //保存済みのtransactionsを使う//
             .reduce((sum, scheduledpayments) =>{
                 //一件ずつtransactionから取り出して合計する//
@@ -205,6 +205,12 @@ const scheduledPaymentTotal = computed(()=>{
                 //このreturnは今回計算した新しい合計値を次の計算へ渡す。//
             }, 0)
         //合計の初期値は０//
+    }
+)
+
+const scheduledAvailableFundsTotal = computed(()=>{
+
+        return incomeTotal.value - expenseTotal.value - scheduledPaymentTotal.value
     }
 )
 
@@ -316,7 +322,7 @@ const scheduledPaymentTotal = computed(()=>{
         <p>収入合計:{{ incomeTotal }}円</p>
         <p>現在までの支出:{{ expenseTotal }}円</p>
         <p>今後の支払い{{ scheduledPaymentTotal }}円</p>
-        <p>あと使えるお金</p>
+        <p>あと使えるお金{{ scheduledAvailableFundsTotal }}</p>
 
         <div class="transaction-item"
              v-for="transaction in transactions"
