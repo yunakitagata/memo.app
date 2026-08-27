@@ -284,7 +284,7 @@ const scheduledAvailableFundsTotal = computed(()=>{
             <!--ボタンがクリックされるとsaveMemo()が実行される-->
 
             <PlusSvg class="save-plus"/>
-            <p>記録を保存</p>
+            <span>記録を保存</span>
         </button>
 
         <form>
@@ -316,7 +316,7 @@ const scheduledAvailableFundsTotal = computed(()=>{
             <!--ボタンがクリックされるとsaveMemo()が実行される-->
 
             <PlusSvg class="save-plus"/>
-            <p>記録を保存</p>
+            <span>記録を保存</span>
         </button>
 
         <p>収入合計:{{ incomeTotal }}円</p>
@@ -345,6 +345,19 @@ const scheduledAvailableFundsTotal = computed(()=>{
 
         </div>
 
+        <div class="scheduledpayment-item"
+             v-for="scheduledpayment in scheduledpayments"
+             :key="scheduledpayment.id"
+        >
+            <p>今後の支払い</p>
+            <p class="scheduledpayments-date">{{ scheduledpayment.date }}</p>
+            <p class="scheduledpayments-title">{{ scheduledpayment.title }}</p>
+            <p class="scheduledpayments-amount">{{ scheduledpayment.amount }}</p>
+
+
+
+        </div>
+
 
     </div>
 </template>
@@ -352,7 +365,7 @@ const scheduledAvailableFundsTotal = computed(()=>{
 <style scoped>
 .transaction-item {
     width: 600px;
-    height: 80px;
+    height: 200px;
     margin: 15px auto 0;
     padding: 24px;
     background-color: white;
@@ -361,6 +374,16 @@ const scheduledAvailableFundsTotal = computed(()=>{
 }
 .delete-button{
 
+}
+
+.scheduledpayment-item {
+    width: 600px;
+    height: 200px;
+    margin: 15px auto 0;
+    padding: 24px;
+    background-color: pink;
+    border-radius: 12px;
+    position: relative;
 }
 
 </style>
